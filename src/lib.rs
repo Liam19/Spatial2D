@@ -39,7 +39,7 @@ use core::ops::Range;
 /// assert_eq!(result, 0);
 /// ```
 #[inline]
-pub fn wrap_i32(value: i32, range: Range<i32>) -> i32 {
+pub(crate) fn wrap_i32(value: i32, range: Range<i32>) -> i32 {
     let size = range.end - range.start;
 
     ((value - range.start) % size + size) % size + range.start
