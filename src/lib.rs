@@ -10,10 +10,15 @@ pub use vec2_traits::*;
 
 pub use rng::*;
 
-pub use glam::{IVec2, UVec2, Vec2};
 pub use hashbrown::{HashMap, HashSet};
 pub use itertools::Itertools;
 pub use std::fmt::Debug;
+
+#[cfg(feature = "bevy-math")]
+pub use bevy::math::{IVec2, UVec2, Vec2};
+
+#[cfg(not(feature = "bevy-math"))]
+pub use glam::{IVec2, UVec2, Vec2};
 
 //TEMP:
 

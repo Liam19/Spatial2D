@@ -126,7 +126,6 @@ impl<T> Matrix<T> {
         diag_cost_multiplier: Option<f32>,
     ) -> Option<Vec<UVec2>> {
         let element_count = self.element_count() as usize;
-        let width = self.size().x;
 
         // Flat arrays for storage
         let mut came_from = vec![UVec2::MAX; element_count];

@@ -148,22 +148,22 @@ impl<T> Matrix<T> {
     }
 
     #[inline]
-    pub fn iter(&self) -> MatrixIterator<T> {
+    pub fn iter(&self) -> MatrixIterator<'_, T> {
         MatrixIterator::new(self.inner())
     }
 
     #[inline]
-    pub fn iter_mut(&mut self) -> MatrixMutIterator<T> {
+    pub fn iter_mut(&'_ mut self) -> MatrixMutIterator<'_, T> {
         MatrixMutIterator::new(self.inner_mut())
     }
 
     #[inline]
-    pub fn iter_with_pos(&self) -> MatrixPosIterator<T> {
+    pub fn iter_with_pos(&'_ self) -> MatrixPosIterator<'_, T> {
         MatrixPosIterator::new(self.inner(), self.size.x)
     }
 
     #[inline]
-    pub fn iter_with_pos_mut(&mut self) -> MatrixPosMutIterator<T> {
+    pub fn iter_with_pos_mut(&mut self) -> MatrixPosMutIterator<'_, T> {
         let width = self.size.x;
 
         MatrixPosMutIterator::new(self.inner_mut(), width)
