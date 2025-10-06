@@ -8,7 +8,7 @@ pub use matrix_module::*;
 pub use rect::*;
 pub use vec2_traits::*;
 
-pub use rng::*;
+pub(crate) use rng::*;
 
 pub use hashbrown::{HashMap, HashSet};
 pub use itertools::Itertools;
