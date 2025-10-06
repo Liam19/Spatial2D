@@ -7,6 +7,9 @@ edition = "2024"
 default = ["glam"]   # default to plain glam
 bevy-math = ["bevy"] # enable to use Bevy's math types instead
 
+[dev-dependencies]
+criterion = { version = "0.7.0", features = ["html_reports"] }
+
 [dependencies]
 rng = { git = "https://github.com/Liam19/Rng.git" }
 
@@ -16,3 +19,7 @@ bevy = { version = "0.16.1", default-features = false, optional = true }
 hashbrown = "0.16.0"
 itertools = "0.14.0"
 priority-queue = "2.5.0"
+
+[[bench]]
+name = "matrix_benchmarks"
+harness = false
