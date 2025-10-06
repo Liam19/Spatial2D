@@ -1,0 +1,12 @@
+[package]
+name = "spatial2d"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rng = { git = "https://github.com/Liam19/Rng.git" }
+
+glam = "0.30.8"
+hashbrown = "0.16.0"
+itertools = "0.14.0"
+priority-queue = "2.5.0"
