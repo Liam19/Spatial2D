@@ -178,9 +178,9 @@ impl<T: Clone + Debug> Matrix<T> {
     // }
 }
 
+/// Clockwise rotations in 90 degree increments
 #[derive(Clone, Copy)]
-/// Rotations of 90 degrees clockwise
-pub enum Rotation {
+pub enum MatrixRotation {
     /// 90 degrees clockwise
     D90,
     /// 180 degrees clockwise

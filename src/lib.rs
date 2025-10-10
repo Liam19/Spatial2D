@@ -21,7 +21,6 @@ pub use bevy::math::{IVec2, UVec2, Vec2};
 pub use glam::{IVec2, UVec2, Vec2};
 
 //TEMP:
-
 use core::ops::Range;
 /// Wraps a value around a specified range.
 ///
