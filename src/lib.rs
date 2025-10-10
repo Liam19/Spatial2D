@@ -10,9 +10,9 @@ pub use vec2_traits::*;
 
 pub(crate) use rng::*;
 
-pub use hashbrown::{HashMap, HashSet};
-pub use itertools::Itertools;
-pub use std::fmt::Debug;
+pub(crate) use hashbrown::{HashMap, HashSet};
+pub(crate) use itertools::Itertools;
+pub(crate) use std::fmt::Debug;
 
 #[cfg(feature = "bevy-math")]
 pub use bevy::math::{IVec2, UVec2, Vec2};
