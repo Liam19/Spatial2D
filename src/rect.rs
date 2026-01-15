@@ -119,13 +119,25 @@ impl Rect {
     //     if self.width() > self.height()
     // }
 
-    /// Inclusive
     #[inline]
-    pub fn positions(&self) -> Vec<UVec2> {
+    pub fn positions_inclusive(&self) -> Vec<UVec2> {
         let mut positions = Vec::new();
 
         for y in self.top_left_corner.y..=self.bottom_right_corner.y {
             for x in self.top_left_corner.x..=self.bottom_right_corner.x {
+                positions.push(UVec2::new(x, y));
+            }
+        }
+
+        positions
+    }
+
+    #[inline]
+    pub fn positions_exclusive(&self) -> Vec<UVec2> {
+        let mut positions = Vec::new();
+
+        for y in self.top_left_corner.y..self.bottom_right_corner.y {
+            for x in self.top_left_corner.x..self.bottom_right_corner.x {
                 positions.push(UVec2::new(x, y));
             }
         }
@@ -139,7 +151,7 @@ impl Rect {
         let valid_xs = [self.top_left_corner.x, self.bottom_right_corner.x];
         let valid_ys = [self.top_left_corner.y, self.bottom_right_corner.y];
 
-        self.positions()
+        self.positions_inclusive()
             .into_iter()
             .filter(|&pos| valid_xs.contains(&pos.x) || valid_ys.contains(&pos.y))
             .collect()
