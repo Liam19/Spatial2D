@@ -1,83 +1,84 @@
 use crate::*;
 
+#[cfg_attr(feature = "bevy", derive(Reflect))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub struct Rect {
-    pub top_left_corner: UVec2,
-    pub bottom_right_corner: UVec2,
+pub struct Rect<T: RectScalar> {
+    pub top_left: T::V2,
+    pub bottom_right: T::V2,
 }
 
-impl Rect {
-    pub fn from_top_left_and_size(top_left_corner: UVec2, size: UVec2) -> Self {
+impl<T: RectScalar> Rect<T> {
+    pub fn from_top_left_and_size(top_left: T::V2, size: T::V2) -> Self {
         Self {
-            top_left_corner,
-            bottom_right_corner: top_left_corner + size,
+            top_left,
+            bottom_right: top_left + size,
         }
     }
 
-    pub fn from_center_and_size(center_pos: UVec2, size: UVec2) -> Self {
+    pub fn from_center_and_size(center_pos: T::V2, size: T::V2) -> Self {
         Self {
-            top_left_corner: center_pos - (size / 2),
-            bottom_right_corner: center_pos + (size / 2),
+            top_left: center_pos - (size / T::two()),
+            bottom_right: center_pos + (size / T::two()),
         }
     }
 
-    pub fn from_corners(top_left_corner: UVec2, bottom_right_corner: UVec2) -> Self {
+    pub fn from_corners(top_left: T::V2, bottom_right: T::V2) -> Self {
         assert!(
-            top_left_corner.x < bottom_right_corner.x && top_left_corner.y < bottom_right_corner.y,
-            "{top_left_corner}, {bottom_right_corner}"
+            T::v2_x(top_left) < T::v2_x(bottom_right) && T::v2_y(top_left) < T::v2_y(bottom_right),
+            "{top_left}, {bottom_right}"
         );
 
         Self {
-            top_left_corner,
-            bottom_right_corner,
+            top_left,
+            bottom_right,
         }
     }
 
     #[inline]
-    pub fn bounds_from_positions(positions: &[UVec2]) -> Self {
-        let mut min_x = u32::MAX;
-        let mut min_y = u32::MAX;
-        let mut max_x = 0u32;
-        let mut max_y = 0u32;
+    pub fn bounds_from_positions(positions: &[T::V2]) -> Self {
+        let mut min_x = T::max();
+        let mut min_y = T::max();
+        let mut max_x = T::zero();
+        let mut max_y = T::zero();
 
         for &pos in positions {
-            if pos.x < min_x {
-                min_x = pos.x;
+            if T::v2_x(pos) < min_x {
+                min_x = T::v2_x(pos);
             }
-            if pos.y < min_y {
-                min_y = pos.y;
+            if T::v2_y(pos) < min_y {
+                min_y = T::v2_y(pos);
             }
-            if pos.x > max_x {
-                max_x = pos.x;
+            if T::v2_x(pos) > max_x {
+                max_x = T::v2_x(pos);
             }
-            if pos.y > max_y {
-                max_y = pos.y;
+            if T::v2_y(pos) > max_y {
+                max_y = T::v2_y(pos);
             }
         }
 
-        Self::from_corners(UVec2::new(min_x, min_y), UVec2::new(max_x, max_y))
+        Self::from_corners(T::v2_new(min_x, min_y), T::v2_new(max_x, max_y))
     }
 
     /// Top left, Top right, Bottom left, Bottom right
     #[inline]
-    pub fn corners(&self) -> [UVec2; 4] {
+    pub fn corners(&self) -> [T::V2; 4] {
         [
-            self.top_left_corner,
-            UVec2::new(self.bottom_right_corner.x, self.top_left_corner.y),
-            UVec2::new(self.top_left_corner.x, self.bottom_right_corner.y),
-            self.bottom_right_corner,
+            self.top_left,
+            T::v2_new(T::v2_x(self.bottom_right), T::v2_y(self.top_left)),
+            T::v2_new(T::v2_x(self.top_left), T::v2_y(self.bottom_right)),
+            self.bottom_right,
         ]
     }
 
     #[inline]
-    pub fn center(&self) -> UVec2 {
-        self.top_left_corner + (self.size() / 2)
+    pub fn center(&self) -> T::V2 {
+        self.top_left + (self.size() / T::two())
     }
 
     #[inline]
     pub fn aspect_ratio(&self) -> f32 {
         //! might not need abs()
-        (self.size().min_element() as f32 / self.size().max_element() as f32).abs()
+        (T::v2_min_element(self.size()).to_f32() / T::v2_max_element(self.size()).to_f32()).abs()
     }
 
     /// Assumes Rect is not square
@@ -93,23 +94,23 @@ impl Rect {
     }
 
     #[inline]
-    pub fn width(&self) -> u32 {
-        self.bottom_right_corner.x - self.top_left_corner.x
+    pub fn width(&self) -> T {
+        T::v2_x(self.bottom_right) - T::v2_x(self.top_left)
     }
 
     #[inline]
-    pub fn height(&self) -> u32 {
-        self.bottom_right_corner.y - self.top_left_corner.y
+    pub fn height(&self) -> T {
+        T::v2_y(self.bottom_right) - T::v2_y(self.top_left)
     }
 
     #[inline]
-    pub fn size(&self) -> UVec2 {
-        self.bottom_right_corner - self.top_left_corner
+    pub fn size(&self) -> T::V2 {
+        self.bottom_right - self.top_left
     }
 
     #[inline]
-    pub fn area(&self) -> u32 {
-        self.size().element_product()
+    pub fn area(&self) -> T {
+        T::v2_element_product(self.size())
     }
 
     // #[inline]
@@ -120,78 +121,40 @@ impl Rect {
     // }
 
     #[inline]
-    pub fn positions_inclusive(&self) -> Vec<UVec2> {
-        let mut positions = Vec::new();
-
-        for y in self.top_left_corner.y..=self.bottom_right_corner.y {
-            for x in self.top_left_corner.x..=self.bottom_right_corner.x {
-                positions.push(UVec2::new(x, y));
-            }
-        }
-
-        positions
-    }
-
-    #[inline]
-    pub fn positions_exclusive(&self) -> Vec<UVec2> {
-        let mut positions = Vec::new();
-
-        for y in self.top_left_corner.y..self.bottom_right_corner.y {
-            for x in self.top_left_corner.x..self.bottom_right_corner.x {
-                positions.push(UVec2::new(x, y));
-            }
-        }
-
-        positions
-    }
-
-    /// TODO - improve performance
-    #[inline]
-    pub fn border_positions(&self) -> Vec<UVec2> {
-        let valid_xs = [self.top_left_corner.x, self.bottom_right_corner.x];
-        let valid_ys = [self.top_left_corner.y, self.bottom_right_corner.y];
-
-        self.positions_inclusive()
-            .into_iter()
-            .filter(|&pos| valid_xs.contains(&pos.x) || valid_ys.contains(&pos.y))
-            .collect()
-    }
-
-    #[inline]
-    pub fn contains_pos(&self, pos: UVec2) -> bool {
-        pos.x >= self.top_left_corner.x
-            && pos.y >= self.top_left_corner.y
-            && pos.x <= self.bottom_right_corner.x
-            && pos.y <= self.bottom_right_corner.y
+    pub fn contains_pos(&self, pos: T::V2) -> bool {
+        T::v2_x(pos) >= T::v2_x(self.top_left)
+            && T::v2_y(pos) >= T::v2_y(self.top_left)
+            && T::v2_x(pos) <= T::v2_x(self.bottom_right)
+            && T::v2_y(pos) <= T::v2_y(self.bottom_right)
     }
 }
 
-impl Rect {
+impl<T: RectScalar> Rect<T> {
     /// Expands in all directions
     #[must_use]
     #[inline]
-    pub fn expand(&self, amount: u32) -> Self {
+    pub fn expanded(&self, amount: T) -> Self {
         Self::from_corners(
-            self.top_left_corner - UVec2::new(amount, amount),
-            self.bottom_right_corner + UVec2::new(amount, amount),
+            self.top_left - T::v2_new(amount, amount),
+            self.bottom_right + T::v2_new(amount, amount),
         )
     }
 
     /// Expands in all directions
     #[inline]
-    pub fn expand_in_place(&mut self, amount: u32) {
-        self.top_left_corner -= UVec2::new(amount, amount);
-        self.bottom_right_corner += UVec2::new(amount, amount);
+    pub fn expand(&mut self, amount: T) {
+        self.top_left -= T::v2_new(amount, amount);
+        self.bottom_right += T::v2_new(amount, amount);
     }
 
     /// Panics if direction is not cardinal
     #[inline]
-    pub fn extend_in_dir(&mut self, direction: Direction, amount: u32) {
+    pub fn extend_in_dir(&mut self, direction: Direction, amount: T) {
         match direction {
-            Direction::North => self.top_left_corner.y -= amount,
-            Direction::East => self.bottom_right_corner.x += amount,
-            Direction::South => self.bottom_right_corner.y += amount,
-            Direction::West => self.top_left_corner.x -= amount,
+            Direction::North => *T::v2_y_mut(&mut self.top_left) -= amount,
+            Direction::East => *T::v2_x_mut(&mut self.bottom_right) += amount,
+            Direction::South => *T::v2_y_mut(&mut self.bottom_right) += amount,
+            Direction::West => *T::v2_x_mut(&mut self.top_left) -= amount,
             _ => panic!("Extend direction must be cardinal"),
         }
     }
@@ -200,90 +163,81 @@ impl Rect {
     ///
     /// Panics if direction is not cardinal, or if Rect is too small
     #[inline]
-    pub fn shrink_in_dir(&mut self, direction: Direction, amount: u32) {
+    pub fn shrink_in_dir(&mut self, direction: Direction, amount: T) {
         match direction {
-            Direction::North => self.bottom_right_corner.y -= amount,
-            Direction::East => self.top_left_corner.x += amount,
-            Direction::South => self.top_left_corner.y += amount,
-            Direction::West => self.bottom_right_corner.x -= amount,
+            Direction::North => *T::v2_y_mut(&mut self.bottom_right) -= amount,
+            Direction::East => *T::v2_x_mut(&mut self.top_left) += amount,
+            Direction::South => *T::v2_y_mut(&mut self.top_left) += amount,
+            Direction::West => *T::v2_x_mut(&mut self.bottom_right) -= amount,
             _ => panic!("Shrink direction must be cardinal"),
         }
     }
 
     /// Returns None if Rect is too small
-    pub fn shrink(&self, amount: u32) -> Option<Self> {
+    pub fn shrink(&self, amount: T) -> Option<Self> {
         // Min Rect size of 2x2 ?
-        let min_length = (amount * 2) + 2;
+        let min_length = (amount * T::two()) + T::two();
 
         if self.width() < min_length || self.height() < min_length {
             return None;
         }
 
         Some(Self::from_corners(
-            self.top_left_corner + UVec2::new(amount, amount),
-            self.bottom_right_corner - UVec2::new(amount, amount),
+            self.top_left + T::v2_new(amount, amount),
+            self.bottom_right - T::v2_new(amount, amount),
         ))
     }
 
     /// Panics if Rect is too small
-    pub fn shrink_in_place(&mut self, amount: u32) {
+    pub fn shrink_in_place(&mut self, amount: T) {
         // Min Rect size of 2x2 ?
-        let min_length = (amount * 2) + 2;
+        let min_length = (amount * T::two()) + T::two();
 
         if self.width() < min_length || self.height() < min_length {
             panic!("Rect is too small to shrink by {amount}");
         }
 
-        self.top_left_corner += UVec2::new(amount, amount);
-        self.bottom_right_corner -= UVec2::new(amount, amount);
+        self.top_left += T::v2_new(amount, amount);
+        self.bottom_right -= T::v2_new(amount, amount);
     }
 
-    #[deprecated = "Need to fix ?"]
-    /// Must be power of 2
-    pub fn scale_up(&mut self, scale_factor: u32) {
-        debug_assert!(scale_factor.is_power_of_two());
-
-        let scale = UVec2::splat(scale_factor);
-
-        self.top_left_corner *= scale;
-        self.bottom_right_corner *= scale;
+    pub fn scale_up(&mut self, scale_factor: T::V2) {
+        self.top_left *= scale_factor;
+        self.bottom_right *= scale_factor;
     }
 
-    #[deprecated = "Need to fix ?"]
-    pub fn scale_down(&mut self, scale_factor: u32) {
-        let scale = UVec2::splat(scale_factor);
-
-        self.top_left_corner /= scale;
-        self.bottom_right_corner /= scale;
+    pub fn scale_down(&mut self, scale_factor: T::V2) {
+        self.top_left /= scale_factor;
+        self.bottom_right /= scale_factor;
     }
 
-    #[inline]
-    pub fn scale_vector(&mut self, scale_vector: Vec2) {
-        self.top_left_corner = (self.top_left_corner.as_vec2() * scale_vector).as_uvec2();
-        self.bottom_right_corner = (self.bottom_right_corner.as_vec2() * scale_vector).as_uvec2();
-    }
-
-    pub fn bisect_at(&self, orientation: Orientation, split_point: u32) -> (Self, Self) {
+    pub fn bisect_at(&self, orientation: Orientation, split_point: T) -> (Self, Self) {
         let rect_1;
         let rect_2;
 
         match orientation {
             Orientation::Vertical => {
-                let tl_1 = self.top_left_corner;
-                let br_1 = UVec2::new(tl_1.x + split_point, self.bottom_right_corner.y);
+                let tl_1 = self.top_left;
+                let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
 
-                let tl_2 = UVec2::new(tl_1.x + split_point + 1, self.top_left_corner.y);
-                let br_2 = self.bottom_right_corner;
+                let tl_2 = T::v2_new(
+                    T::v2_x(tl_1) + split_point + T::one(),
+                    T::v2_y(self.top_left),
+                );
+                let br_2 = self.bottom_right;
 
                 rect_1 = Self::from_corners(tl_1, br_1);
                 rect_2 = Self::from_corners(tl_2, br_2);
             }
             Orientation::Horizontal => {
-                let tl_1 = self.top_left_corner;
-                let br_1 = UVec2::new(self.bottom_right_corner.x, tl_1.y + split_point);
+                let tl_1 = self.top_left;
+                let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
 
-                let tl_2 = UVec2::new(self.top_left_corner.x, tl_1.y + split_point + 1);
-                let br_2 = self.bottom_right_corner;
+                let tl_2 = T::v2_new(
+                    T::v2_x(self.top_left),
+                    T::v2_y(tl_1) + split_point + T::one(),
+                );
+                let br_2 = self.bottom_right;
 
                 rect_1 = Self::from_corners(tl_1, br_1);
                 rect_2 = Self::from_corners(tl_2, br_2);
@@ -297,10 +251,10 @@ impl Rect {
         &self,
         length_orientation: Orientation,
         length_percent: f32,
-    ) -> u32 {
+    ) -> T {
         match length_orientation {
-            Orientation::Vertical => (self.size().y as f32 * length_percent) as u32,
-            Orientation::Horizontal => (self.size().x as f32 * length_percent) as u32,
+            Orientation::Vertical => T::from_f32(T::v2_y(self.size()).to_f32() * length_percent),
+            Orientation::Horizontal => T::from_f32(T::v2_x(self.size()).to_f32() * length_percent),
         }
     }
 
@@ -308,13 +262,13 @@ impl Rect {
         &self,
         length_orientation: Orientation,
         length_percent: f32,
-    ) -> u32 {
+    ) -> T {
         match length_orientation {
             Orientation::Vertical => {
-                self.top_left_corner.y + (self.size().y as f32 * length_percent) as u32
+                T::v2_x(self.top_left) + T::from_f32(T::v2_y(self.size()).to_f32() * length_percent)
             }
             Orientation::Horizontal => {
-                self.top_left_corner.x + (self.size().x as f32 * length_percent) as u32
+                T::v2_y(self.top_left) + T::from_f32(T::v2_x(self.size()).to_f32() * length_percent)
             }
         }
     }
@@ -329,25 +283,31 @@ impl Rect {
 
         match orientation {
             Orientation::Vertical => {
-                let split_point = (self.size().x as f32 * length_percent) as u32;
+                let split_point = T::from_f32(T::v2_x(self.size()).to_f32() * length_percent);
 
-                let tl_1 = self.top_left_corner;
-                let br_1 = UVec2::new(tl_1.x + split_point, self.bottom_right_corner.y);
+                let tl_1 = self.top_left;
+                let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
 
-                let tl_2 = UVec2::new(tl_1.x + split_point + 1, self.top_left_corner.y);
-                let br_2 = self.bottom_right_corner;
+                let tl_2 = T::v2_new(
+                    T::v2_x(tl_1) + split_point + T::one(),
+                    T::v2_y(self.top_left),
+                );
+                let br_2 = self.bottom_right;
 
                 rect_1 = Self::from_corners(tl_1, br_1);
                 rect_2 = Self::from_corners(tl_2, br_2);
             }
             Orientation::Horizontal => {
-                let split_point = (self.size().y as f32 * length_percent) as u32;
+                let split_point = T::from_f32(T::v2_y(self.size()).to_f32() * length_percent);
 
-                let tl_1 = self.top_left_corner;
-                let br_1 = UVec2::new(self.bottom_right_corner.x, tl_1.y + split_point);
+                let tl_1 = self.top_left;
+                let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
 
-                let tl_2 = UVec2::new(self.top_left_corner.x, tl_1.y + split_point + 1);
-                let br_2 = self.bottom_right_corner;
+                let tl_2 = T::v2_new(
+                    T::v2_x(self.top_left),
+                    T::v2_y(tl_1) + split_point + T::one(),
+                );
+                let br_2 = self.bottom_right;
 
                 rect_1 = Self::from_corners(tl_1, br_1);
                 rect_2 = Self::from_corners(tl_2, br_2);
@@ -358,16 +318,98 @@ impl Rect {
     }
 }
 
-impl PartialOrd for Rect {
+// impl<T: RectScalar> PartialOrd for Rect<T> {
+//     #[inline]
+//     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+//         Some(self.cmp(other))
+//     }
+// }
+
+// impl Ord for Rect {
+//     #[inline]
+//     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+//         self.area().cmp(&other.area())
+//     }
+// }
+
+impl Rect<u32> {
+    /// Exclusive
     #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
-        Some(self.cmp(other))
+    pub fn positions(&self) -> Vec<UVec2> {
+        let mut positions = Vec::new();
+
+        for y in self.top_left.y..self.bottom_right.y {
+            for x in self.top_left.x..self.bottom_right.x {
+                positions.push(UVec2::new(x, y));
+            }
+        }
+
+        positions
+    }
+
+    #[inline]
+    pub fn positions_inclusive(&self) -> Vec<UVec2> {
+        let mut positions = Vec::new();
+
+        for y in self.top_left.y..=self.bottom_right.y {
+            for x in self.top_left.x..=self.bottom_right.x {
+                positions.push(UVec2::new(x, y));
+            }
+        }
+
+        positions
+    }
+
+    /// TODO - improve performance
+    #[inline]
+    pub fn border_positions(&self) -> Vec<UVec2> {
+        let valid_xs = [self.top_left.x, self.bottom_right.x];
+        let valid_ys = [self.top_left.y, self.bottom_right.y];
+
+        self.positions_inclusive()
+            .into_iter()
+            .filter(|&pos| valid_xs.contains(&pos.x) || valid_ys.contains(&pos.y))
+            .collect()
     }
 }
 
-impl Ord for Rect {
+impl Rect<i32> {
+    /// Exclusive
     #[inline]
-    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
-        self.area().cmp(&other.area())
+    pub fn positions(&self) -> Vec<IVec2> {
+        let mut positions = Vec::new();
+
+        for y in self.top_left.y..self.bottom_right.y {
+            for x in self.top_left.x..self.bottom_right.x {
+                positions.push(IVec2::new(x, y));
+            }
+        }
+
+        positions
+    }
+
+    #[inline]
+    pub fn positions_inclusive(&self) -> Vec<IVec2> {
+        let mut positions = Vec::new();
+
+        for y in self.top_left.y..=self.bottom_right.y {
+            for x in self.top_left.x..=self.bottom_right.x {
+                positions.push(IVec2::new(x, y));
+            }
+        }
+
+        positions
+    }
+
+    /// TODO - improve performance
+    #[inline]
+    pub fn border_positions(&self) -> Vec<IVec2> {
+        let valid_xs = [self.top_left.x, self.bottom_right.x];
+        let valid_ys = [self.top_left.y, self.bottom_right.y];
+
+        self.positions_inclusive()
+            .into_iter()
+            .filter(|&pos| valid_xs.contains(&pos.x) || valid_ys.contains(&pos.y))
+            .collect()
     }
 }

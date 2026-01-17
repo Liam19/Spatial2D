@@ -5,7 +5,7 @@ edition = "2024"
 
 [features]
 default = ["glam"]   # default to plain glam
-bevy-math = ["bevy"] # enable to use Bevy's math types instead
+bevy = ["dep:bevy"] # enable to use Bevy's math types instead
 
 [dev-dependencies]
 criterion = { version = "0.7.0", features = ["html_reports"] }

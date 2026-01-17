@@ -1,11 +1,15 @@
 mod direction;
 mod matrix_module;
 mod rect;
+mod rect_scalar;
+// mod rectangle;
 mod vec2_traits;
 
 pub use direction::*;
 pub use matrix_module::*;
 pub use rect::*;
+pub use rect_scalar::*;
+// pub use rectangle::*;
 pub use vec2_traits::*;
 
 pub(crate) use rng::*;
@@ -14,10 +18,13 @@ pub(crate) use hashbrown::{HashMap, HashSet};
 pub(crate) use itertools::Itertools;
 pub(crate) use std::fmt::Debug;
 
-#[cfg(feature = "bevy-math")]
-pub use bevy::math::{IVec2, UVec2, Vec2};
+#[cfg(feature = "bevy")]
+pub use bevy::{
+    math::{IVec2, UVec2, Vec2},
+    prelude::Reflect,
+};
 
-#[cfg(not(feature = "bevy-math"))]
+#[cfg(not(feature = "bevy"))]
 pub use glam::{IVec2, UVec2, Vec2};
 
 //TEMP:
