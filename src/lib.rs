@@ -19,7 +19,7 @@ pub(crate) use itertools::Itertools;
 pub(crate) use std::fmt::Debug;
 
 #[cfg(feature = "bevy")]
-pub use bevy::{
+pub(crate) use bevy::{
     math::{IVec2, UVec2, Vec2},
     prelude::Reflect,
 };
