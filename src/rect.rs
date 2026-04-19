@@ -141,6 +141,8 @@ impl<T: RectScalar> Rect<T> {
     }
 
     /// Expands in all directions
+    ///
+    /// In-place version of `expand`
     #[inline]
     pub fn expand(&mut self, amount: T) {
         self.top_left -= T::v2_new(amount, amount);

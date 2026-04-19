@@ -14,13 +14,16 @@ pub use vec2_traits::*;
 
 pub(crate) use rng::*;
 
+#[cfg(not(feature = "bevy"))]
 pub(crate) use hashbrown::{HashMap, HashSet};
+
 pub(crate) use itertools::Itertools;
 pub(crate) use std::fmt::Debug;
 
 #[cfg(feature = "bevy")]
 pub(crate) use bevy::{
     math::{IVec2, UVec2, Vec2},
+    platform::collections::{HashMap, HashSet},
     prelude::Reflect,
 };
 

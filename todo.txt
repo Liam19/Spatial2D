@@ -1,0 +1,9 @@
+/// Linear interpolate one Vec2 to another
+///
+/// Equivalent to lerping x & y values
+#[inline]
+pub fn lerp_vec2(vector: Vec2, target: Vec2, speed: f32) -> Vec2 {
+    vector + (target - vector) * (speed)
+}
+
+Derive reflect for matrix and other types
