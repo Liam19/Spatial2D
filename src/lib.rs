@@ -15,20 +15,20 @@ pub use vec2_traits::*;
 pub(crate) use rng::*;
 
 #[cfg(not(feature = "bevy"))]
-pub(crate) use hashbrown::{HashMap, HashSet};
+pub use glam::{IVec2, UVec2, Vec2};
+#[cfg(not(feature = "bevy"))]
+pub use hashbrown::{HashMap, HashSet};
 
 pub(crate) use itertools::Itertools;
 pub(crate) use std::fmt::Debug;
 
 #[cfg(feature = "bevy")]
-pub(crate) use bevy::{
+pub(crate) use bevy::prelude::Reflect;
+#[cfg(feature = "bevy")]
+pub use bevy::{
     math::{IVec2, UVec2, Vec2},
     platform::collections::{HashMap, HashSet},
-    prelude::Reflect,
 };
-
-#[cfg(not(feature = "bevy"))]
-pub use glam::{IVec2, UVec2, Vec2};
 
 //TEMP:
 use core::ops::Range;
