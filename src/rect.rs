@@ -56,6 +56,15 @@ impl<T: RectScalar> Rect<T> {
             }
         }
 
+        debug_assert!(
+            max_x > min_x && max_y > min_y,
+            "Invalid bounding rect\nmin_x: {}, max_x: {}\nmin_y: {}, max_y: {}",
+            min_x,
+            max_x,
+            min_y,
+            max_y
+        );
+
         Self::from_corners(T::v2_new(min_x, min_y), T::v2_new(max_x, max_y))
     }
 
