@@ -68,6 +68,39 @@ impl<T: RectScalar> Rect<T> {
         Self::from_corners(T::v2_new(min_x, min_y), T::v2_new(max_x, max_y))
     }
 
+    /// TODO - change to Result ?
+    #[inline]
+    pub fn bounds_from_positions_checked(positions: &[T::V2]) -> Option<Self> {
+        let mut min_x = T::max();
+        let mut min_y = T::max();
+        let mut max_x = T::zero();
+        let mut max_y = T::zero();
+
+        for &pos in positions {
+            if T::v2_x(pos) < min_x {
+                min_x = T::v2_x(pos);
+            }
+            if T::v2_y(pos) < min_y {
+                min_y = T::v2_y(pos);
+            }
+            if T::v2_x(pos) > max_x {
+                max_x = T::v2_x(pos);
+            }
+            if T::v2_y(pos) > max_y {
+                max_y = T::v2_y(pos);
+            }
+        }
+
+        if !(max_x > min_x && max_y > min_y) {
+            return None;
+        }
+
+        Some(Self::from_corners(
+            T::v2_new(min_x, min_y),
+            T::v2_new(max_x, max_y),
+        ))
+    }
+
     /// Top left, Top right, Bottom left, Bottom right
     #[inline]
     pub fn corners(&self) -> [T::V2; 4] {
