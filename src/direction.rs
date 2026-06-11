@@ -1,6 +1,7 @@
 use crate::*;
 
 use core::fmt;
+use std::hint::unreachable_unchecked;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Direction {
@@ -44,7 +45,7 @@ impl Direction {
             5 => Self::SouthEast,
             6 => Self::SouthWest,
             7 => Self::NorthWest,
-            _ => panic!(),
+            _ => unsafe { unreachable_unchecked() },
         }
     }
 
@@ -57,7 +58,7 @@ impl Direction {
             1 => Self::East,
             2 => Self::South,
             3 => Self::West,
-            _ => panic!(),
+            _ => unsafe { unreachable_unchecked() },
         }
     }
 
@@ -70,7 +71,7 @@ impl Direction {
             1 => Self::SouthEast,
             2 => Self::SouthWest,
             3 => Self::NorthWest,
-            _ => panic!(),
+            _ => unsafe { unreachable_unchecked() },
         }
     }
 
@@ -89,6 +90,30 @@ impl Direction {
             Direction::North | Direction::East | Direction::South | Direction::West => true,
             _ => false,
         }
+    }
+
+    #[inline]
+    const fn index_for_angle(self) -> u8 {
+        match self {
+            Self::North => 0,
+            Self::NorthEast => 1,
+            Self::East => 2,
+            Self::SouthEast => 3,
+            Self::South => 4,
+            Self::SouthWest => 5,
+            Self::West => 6,
+            Self::NorthWest => 7,
+        }
+    }
+
+    #[inline]
+    pub fn angle_difference(self, other: Self) -> f32 {
+        debug_assert!(self != other);
+
+        let diff = self.index_for_angle().abs_diff(other.index_for_angle());
+        let steps = diff.min(8 - diff);
+
+        steps as f32 * core::f32::consts::FRAC_PI_4
     }
 
     #[inline]
