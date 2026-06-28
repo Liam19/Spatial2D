@@ -127,7 +127,7 @@ pub trait Neighbours {
 
     fn neighbours_square(&self, radius: u32) -> Vec<Self::V>;
 
-    fn neighbours_circle(&self, radius: u32) -> Vec<Self::V>;
+    fn neighbours_radius(&self, radius: f32) -> Vec<Self::V>;
 }
 
 impl Neighbours for IVec2 {
@@ -217,21 +217,20 @@ impl Neighbours for IVec2 {
     }
 
     #[inline]
-    fn neighbours_circle(&self, radius: u32) -> Vec<Self::V> {
-        let r = radius as i32;
+    fn neighbours_radius(&self, radius: f32) -> Vec<Self::V> {
+        let radius_i = radius as i32;
+        let half_block = IVec2::splat(radius_i);
 
-        IVec2::splat(r * 2)
+        IVec2::splat(radius_i * 2)
             .positions_inclusive()
             .into_iter()
-            .map(|pos| self + (pos - IVec2::splat(r)))
+            .map(|pos| self + (pos - half_block))
             .filter(|pos| {
                 if pos == self {
                     return false;
                 }
 
-                let dist = self.as_vec2().distance(pos.as_vec2());
-
-                if dist > radius as f32 {
+                if self.distance_euclidian(*pos) > radius {
                     return false;
                 }
 
@@ -326,22 +325,20 @@ impl Neighbours for UVec2 {
     }
 
     #[inline]
-    fn neighbours_circle(&self, radius: u32) -> Vec<Self::V> {
-        let r = radius as i32;
-        let square = IVec2::splat(r);
+    fn neighbours_radius(&self, radius: f32) -> Vec<Self::V> {
+        let radius_i = radius as i32;
+        let half_block = IVec2::splat(radius_i);
 
-        IVec2::splat(r * 2)
+        IVec2::splat(radius_i * 2)
             .positions_inclusive()
             .into_iter()
-            .map(|pos| (self.as_ivec2() + (pos - square)).as_uvec2())
+            .map(|pos| (self.as_ivec2() + (pos - half_block)).as_uvec2())
             .filter(|pos| {
                 if pos == self {
                     return false;
                 }
 
-                let dist = self.as_vec2().distance(pos.as_vec2());
-
-                if dist > radius as f32 {
+                if self.distance_euclidian(*pos) > radius {
                     return false;
                 }
 

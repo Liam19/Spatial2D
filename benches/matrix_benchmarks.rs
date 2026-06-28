@@ -129,15 +129,15 @@ fn bench_neighbours(c: &mut Criterion) {
     });
 
     group.bench_function("neighbours_radius 1", |b| {
-        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(1))))
+        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(1.0))))
     });
 
     group.bench_function("neighbours_radius 2", |b| {
-        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(2))))
+        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(2.0))))
     });
 
     group.bench_function("neighbours_radius 3", |b| {
-        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(2))))
+        b.iter(|| black_box(matrix.neighbours_radius(black_box(center_pos), black_box(2.0))))
     });
 
     group.finish();

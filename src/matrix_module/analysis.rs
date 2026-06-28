@@ -184,7 +184,7 @@ impl<T> Matrix<T> {
     }
 
     #[inline]
-    pub fn neighbours_radius(&self, pos: UVec2, radius: u32) -> Vec<UVec2> {
+    pub fn neighbours_radius(&self, pos: UVec2, radius: f32) -> Vec<UVec2> {
         let b_size = IVec2::splat(radius as i32);
         let block = IVec2::splat((radius as i32 * 2) + 1).positions();
         let pos_i = pos.as_ivec2();
@@ -206,6 +206,10 @@ impl<T> Matrix<T> {
                 }
 
                 if !Self::is_in_bounds_multi(sample_pos, size) {
+                    return None;
+                }
+
+                if pos.distance_euclidian(sample_pos) > radius {
                     return None;
                 }
 

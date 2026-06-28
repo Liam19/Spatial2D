@@ -37,6 +37,7 @@ impl<T> Matrix<T> {
         None
     }
 
+    /// TODO - just return `visited` ?
     /// Performs a breadth-first-search until there are no more positions to search.
     ///
     /// Returns all positions where search_fn returned true
