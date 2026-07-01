@@ -1,7 +1,6 @@
 use crate::*;
 
 use core::fmt;
-use std::hint::unreachable_unchecked;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Direction {
@@ -32,6 +31,7 @@ impl fmt::Display for Direction {
 }
 
 impl Direction {
+    #[must_use]
     #[inline]
     pub fn random() -> Self {
         let idx = Rng::new().gen_range(0..8);
@@ -49,6 +49,7 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     pub fn random_no_diag() -> Self {
         let idx = Rng::new().gen_range(0..4);
@@ -62,6 +63,7 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     pub fn random_diag_only() -> Self {
         let idx = Rng::new().gen_range(0..4);
@@ -75,15 +77,18 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     pub const fn to_orientation(&self) -> Orientation {
         match self {
             Direction::North | Direction::South => Orientation::Vertical,
             Direction::East | Direction::West => Orientation::Horizontal,
-            _ => panic!("Cannot get Orientation of diagonal Direction"),
+            Direction::NorthEast | Direction::SouthWest => Orientation::DiagNE,
+            Direction::NorthWest | Direction::SouthEast => Orientation::DiagNW,
         }
     }
 
+    #[must_use]
     #[inline]
     pub const fn is_cardinal(&self) -> bool {
         match self {
@@ -92,6 +97,7 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     const fn index_for_angle(self) -> u8 {
         match self {
@@ -106,9 +112,10 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     pub fn angle_difference(self, other: Self) -> f32 {
-        debug_assert!(self != other);
+        debug_assert!(self != other, "{self}, {other}");
 
         let diff = self.index_for_angle().abs_diff(other.index_for_angle());
         let steps = diff.min(8 - diff);
@@ -116,6 +123,7 @@ impl Direction {
         steps as f32 * core::f32::consts::FRAC_PI_4
     }
 
+    #[must_use]
     #[inline]
     pub const fn all() -> [Self; 8] {
         [
@@ -130,11 +138,13 @@ impl Direction {
         ]
     }
 
+    #[must_use]
     #[inline]
     pub const fn all_no_diag() -> [Self; 4] {
         [Self::North, Self::South, Self::East, Self::West]
     }
 
+    #[must_use]
     #[inline]
     pub const fn all_diag_only() -> [Self; 4] {
         [
@@ -145,6 +155,7 @@ impl Direction {
         ]
     }
 
+    #[must_use]
     #[inline]
     pub const fn all_vectors() -> [IVec2; 8] {
         [
@@ -159,6 +170,7 @@ impl Direction {
         ]
     }
 
+    #[must_use]
     #[inline]
     pub const fn all_vectors_no_diag() -> [IVec2; 4] {
         [
@@ -169,6 +181,7 @@ impl Direction {
         ]
     }
 
+    #[must_use]
     #[inline]
     pub const fn all_vectors_diag_only() -> [IVec2; 4] {
         [
@@ -179,6 +192,7 @@ impl Direction {
         ]
     }
 
+    #[must_use]
     #[inline]
     pub const fn to_vector(self) -> IVec2 {
         match self {
@@ -193,6 +207,7 @@ impl Direction {
         }
     }
 
+    #[must_use]
     #[inline]
     pub const fn from_vector(vector: IVec2) -> Self {
         match (vector.x, vector.y) {
@@ -204,7 +219,7 @@ impl Direction {
             (1, 1) => Self::SouthEast,
             (-1, 1) => Self::SouthWest,
             (-1, -1) => Self::NorthWest,
-            _ => panic!(),
+            _ => unsafe { unreachable_unchecked() },
         }
     }
 
@@ -288,6 +303,8 @@ impl Direction {
 pub enum Orientation {
     Vertical,
     Horizontal,
+    DiagNE,
+    DiagNW,
 }
 
 impl From<Direction> for Orientation {
@@ -295,25 +312,57 @@ impl From<Direction> for Orientation {
         match dir {
             Direction::North | Direction::South => Self::Vertical,
             Direction::East | Direction::West => Self::Horizontal,
-            _ => panic!(),
+            Direction::NorthEast | Direction::SouthWest => Self::DiagNE,
+            Direction::NorthWest | Direction::SouthEast => Self::DiagNW,
         }
+    }
+}
+
+impl fmt::Display for Orientation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            Orientation::Vertical => "Vertical",
+            Orientation::Horizontal => "Horizontal",
+            Orientation::DiagNE => "DiagNE",
+            Orientation::DiagNW => "DiagNW",
+        };
+
+        write!(f, "{s}")
     }
 }
 
 impl Orientation {
     #[must_use]
-    pub fn opposite(self) -> Self {
+    #[inline]
+    pub const fn opposite(self) -> Self {
         match self {
             Orientation::Vertical => Orientation::Horizontal,
             Orientation::Horizontal => Orientation::Vertical,
+            Orientation::DiagNE => Orientation::DiagNW,
+            Orientation::DiagNW => Orientation::DiagNE,
         }
     }
 
+    #[must_use]
+    #[inline]
     pub fn random(rng: &mut Rng) -> Self {
-        if rng.gen_bool(0.5) {
-            Self::Vertical
-        } else {
-            Self::Horizontal
+        match rng.gen_range(0..40) {
+            0 => Self::Vertical,
+            1 => Self::Horizontal,
+            2 => Self::DiagNE,
+            3 => Self::DiagNW,
+            _ => unsafe { unreachable_unchecked() },
+        }
+    }
+
+    #[must_use]
+    #[inline]
+    pub const fn get_directions(&self) -> [Direction; 2] {
+        match self {
+            Orientation::Vertical => [Direction::North, Direction::South],
+            Orientation::Horizontal => [Direction::East, Direction::West],
+            Orientation::DiagNE => [Direction::NorthEast, Direction::SouthWest],
+            Orientation::DiagNW => [Direction::NorthWest, Direction::SouthEast],
         }
     }
 }

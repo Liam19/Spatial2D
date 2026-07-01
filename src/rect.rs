@@ -256,39 +256,41 @@ impl<T: RectScalar> Rect<T> {
     }
 
     pub fn bisect_at(&self, orientation: Orientation, split_point: T) -> (Self, Self) {
-        let rect_1;
-        let rect_2;
+        // let rect_1;
+        // let rect_2;
 
-        match orientation {
-            Orientation::Vertical => {
-                let tl_1 = self.top_left;
-                let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
+        // match orientation {
+        //     Orientation::Vertical => {
+        //         let tl_1 = self.top_left;
+        //         let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
 
-                let tl_2 = T::v2_new(
-                    T::v2_x(tl_1) + split_point + T::one(),
-                    T::v2_y(self.top_left),
-                );
-                let br_2 = self.bottom_right;
+        //         let tl_2 = T::v2_new(
+        //             T::v2_x(tl_1) + split_point + T::one(),
+        //             T::v2_y(self.top_left),
+        //         );
+        //         let br_2 = self.bottom_right;
 
-                rect_1 = Self::from_corners(tl_1, br_1);
-                rect_2 = Self::from_corners(tl_2, br_2);
-            }
-            Orientation::Horizontal => {
-                let tl_1 = self.top_left;
-                let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
+        //         rect_1 = Self::from_corners(tl_1, br_1);
+        //         rect_2 = Self::from_corners(tl_2, br_2);
+        //     }
+        //     Orientation::Horizontal => {
+        //         let tl_1 = self.top_left;
+        //         let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
 
-                let tl_2 = T::v2_new(
-                    T::v2_x(self.top_left),
-                    T::v2_y(tl_1) + split_point + T::one(),
-                );
-                let br_2 = self.bottom_right;
+        //         let tl_2 = T::v2_new(
+        //             T::v2_x(self.top_left),
+        //             T::v2_y(tl_1) + split_point + T::one(),
+        //         );
+        //         let br_2 = self.bottom_right;
 
-                rect_1 = Self::from_corners(tl_1, br_1);
-                rect_2 = Self::from_corners(tl_2, br_2);
-            }
-        }
+        //         rect_1 = Self::from_corners(tl_1, br_1);
+        //         rect_2 = Self::from_corners(tl_2, br_2);
+        //     }
+        // }
 
-        (rect_1, rect_2)
+        // (rect_1, rect_2)
+
+        todo!()
     }
 
     pub fn get_local_coord_at_length_percent(
@@ -296,10 +298,11 @@ impl<T: RectScalar> Rect<T> {
         length_orientation: Orientation,
         length_percent: f32,
     ) -> T {
-        match length_orientation {
-            Orientation::Vertical => T::from_f32(T::v2_y(self.size()).to_f32() * length_percent),
-            Orientation::Horizontal => T::from_f32(T::v2_x(self.size()).to_f32() * length_percent),
-        }
+        // match length_orientation {
+        //     Orientation::Vertical => T::from_f32(T::v2_y(self.size()).to_f32() * length_percent),
+        //     Orientation::Horizontal => T::from_f32(T::v2_x(self.size()).to_f32() * length_percent),
+        // }
+        todo!()
     }
 
     pub fn get_global_coord_at_length_percent(
@@ -307,14 +310,15 @@ impl<T: RectScalar> Rect<T> {
         length_orientation: Orientation,
         length_percent: f32,
     ) -> T {
-        match length_orientation {
-            Orientation::Vertical => {
-                T::v2_x(self.top_left) + T::from_f32(T::v2_y(self.size()).to_f32() * length_percent)
-            }
-            Orientation::Horizontal => {
-                T::v2_y(self.top_left) + T::from_f32(T::v2_x(self.size()).to_f32() * length_percent)
-            }
-        }
+        // match length_orientation {
+        //     Orientation::Vertical => {
+        //         T::v2_x(self.top_left) + T::from_f32(T::v2_y(self.size()).to_f32() * length_percent)
+        //     }
+        //     Orientation::Horizontal => {
+        //         T::v2_y(self.top_left) + T::from_f32(T::v2_x(self.size()).to_f32() * length_percent)
+        //     }
+        // }
+        todo!()
     }
 
     pub fn bisect_at_length_percent(
@@ -322,43 +326,44 @@ impl<T: RectScalar> Rect<T> {
         orientation: Orientation,
         length_percent: f32,
     ) -> (Self, Self) {
-        let rect_1;
-        let rect_2;
+        // let rect_1;
+        // let rect_2;
 
-        match orientation {
-            Orientation::Vertical => {
-                let split_point = T::from_f32(T::v2_x(self.size()).to_f32() * length_percent);
+        // match orientation {
+        //     Orientation::Vertical => {
+        //         let split_point = T::from_f32(T::v2_x(self.size()).to_f32() * length_percent);
 
-                let tl_1 = self.top_left;
-                let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
+        //         let tl_1 = self.top_left;
+        //         let br_1 = T::v2_new(T::v2_x(tl_1) + split_point, T::v2_y(self.bottom_right));
 
-                let tl_2 = T::v2_new(
-                    T::v2_x(tl_1) + split_point + T::one(),
-                    T::v2_y(self.top_left),
-                );
-                let br_2 = self.bottom_right;
+        //         let tl_2 = T::v2_new(
+        //             T::v2_x(tl_1) + split_point + T::one(),
+        //             T::v2_y(self.top_left),
+        //         );
+        //         let br_2 = self.bottom_right;
 
-                rect_1 = Self::from_corners(tl_1, br_1);
-                rect_2 = Self::from_corners(tl_2, br_2);
-            }
-            Orientation::Horizontal => {
-                let split_point = T::from_f32(T::v2_y(self.size()).to_f32() * length_percent);
+        //         rect_1 = Self::from_corners(tl_1, br_1);
+        //         rect_2 = Self::from_corners(tl_2, br_2);
+        //     }
+        //     Orientation::Horizontal => {
+        //         let split_point = T::from_f32(T::v2_y(self.size()).to_f32() * length_percent);
 
-                let tl_1 = self.top_left;
-                let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
+        //         let tl_1 = self.top_left;
+        //         let br_1 = T::v2_new(T::v2_x(self.bottom_right), T::v2_y(tl_1) + split_point);
 
-                let tl_2 = T::v2_new(
-                    T::v2_x(self.top_left),
-                    T::v2_y(tl_1) + split_point + T::one(),
-                );
-                let br_2 = self.bottom_right;
+        //         let tl_2 = T::v2_new(
+        //             T::v2_x(self.top_left),
+        //             T::v2_y(tl_1) + split_point + T::one(),
+        //         );
+        //         let br_2 = self.bottom_right;
 
-                rect_1 = Self::from_corners(tl_1, br_1);
-                rect_2 = Self::from_corners(tl_2, br_2);
-            }
-        }
+        //         rect_1 = Self::from_corners(tl_1, br_1);
+        //         rect_2 = Self::from_corners(tl_2, br_2);
+        //     }
+        // }
 
-        (rect_1, rect_2)
+        // (rect_1, rect_2)
+        todo!()
     }
 }
 

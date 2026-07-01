@@ -21,6 +21,7 @@ pub use hashbrown::{HashMap, HashSet};
 
 pub(crate) use itertools::Itertools;
 pub(crate) use std::fmt::Debug;
+pub(crate) use std::hint::unreachable_unchecked;
 
 #[cfg(feature = "bevy")]
 pub(crate) use bevy::prelude::Reflect;
