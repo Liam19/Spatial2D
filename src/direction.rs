@@ -112,11 +112,10 @@ impl Direction {
         }
     }
 
+    /// In radians
     #[must_use]
     #[inline]
     pub fn angle_difference(self, other: Self) -> f32 {
-        debug_assert!(self != other, "{self}, {other}");
-
         let diff = self.index_for_angle().abs_diff(other.index_for_angle());
         let steps = diff.min(8 - diff);
 
