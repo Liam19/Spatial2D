@@ -56,23 +56,23 @@ impl<T> Matrix<T> {
 
     //TODO? - check if pos in near border, and skip checks if not
     #[inline]
-    pub fn valid_dirs(&self, pos: UVec2) -> Vec<Direction> {
+    pub fn valid_dirs(&self, pos: UVec2) -> Vec<Dir> {
         let mut valid_dirs = Vec::with_capacity(4);
 
         let size = self.size();
         let neighbours = pos.neighbours_no_diag();
 
         if Self::is_in_bounds_multi(neighbours[0], size) {
-            valid_dirs.push(Direction::North);
+            valid_dirs.push(Dir::N);
         }
         if Self::is_in_bounds_multi(neighbours[1], size) {
-            valid_dirs.push(Direction::West);
+            valid_dirs.push(Dir::W);
         }
         if Self::is_in_bounds_multi(neighbours[2], size) {
-            valid_dirs.push(Direction::East);
+            valid_dirs.push(Dir::E);
         }
         if Self::is_in_bounds_multi(neighbours[3], size) {
-            valid_dirs.push(Direction::South);
+            valid_dirs.push(Dir::S);
         }
 
         valid_dirs

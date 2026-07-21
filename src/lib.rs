@@ -1,11 +1,13 @@
-mod direction;
+// mod direction;
+mod dir;
 mod matrix_module;
 mod rect;
 mod rect_scalar;
 // mod rectangle;
 mod vec2_traits;
 
-pub use direction::*;
+// pub use direction::*;
+pub use dir::*;
 pub use matrix_module::*;
 pub use rect::*;
 pub use rect_scalar::*;

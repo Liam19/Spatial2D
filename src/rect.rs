@@ -193,12 +193,12 @@ impl<T: RectScalar> Rect<T> {
 
     /// Panics if direction is not cardinal
     #[inline]
-    pub fn extend_in_dir(&mut self, direction: Direction, amount: T) {
+    pub fn extend_in_dir(&mut self, direction: Dir, amount: T) {
         match direction {
-            Direction::North => *T::v2_y_mut(&mut self.top_left) -= amount,
-            Direction::East => *T::v2_x_mut(&mut self.bottom_right) += amount,
-            Direction::South => *T::v2_y_mut(&mut self.bottom_right) += amount,
-            Direction::West => *T::v2_x_mut(&mut self.top_left) -= amount,
+            Dir::N => *T::v2_y_mut(&mut self.top_left) -= amount,
+            Dir::E => *T::v2_x_mut(&mut self.bottom_right) += amount,
+            Dir::S => *T::v2_y_mut(&mut self.bottom_right) += amount,
+            Dir::W => *T::v2_x_mut(&mut self.top_left) -= amount,
             _ => panic!("Extend direction must be cardinal"),
         }
     }
@@ -207,12 +207,12 @@ impl<T: RectScalar> Rect<T> {
     ///
     /// Panics if direction is not cardinal, or if Rect is too small
     #[inline]
-    pub fn shrink_in_dir(&mut self, direction: Direction, amount: T) {
+    pub fn shrink_in_dir(&mut self, direction: Dir, amount: T) {
         match direction {
-            Direction::North => *T::v2_y_mut(&mut self.bottom_right) -= amount,
-            Direction::East => *T::v2_x_mut(&mut self.top_left) += amount,
-            Direction::South => *T::v2_y_mut(&mut self.top_left) += amount,
-            Direction::West => *T::v2_x_mut(&mut self.bottom_right) -= amount,
+            Dir::N => *T::v2_y_mut(&mut self.bottom_right) -= amount,
+            Dir::E => *T::v2_x_mut(&mut self.top_left) += amount,
+            Dir::S => *T::v2_y_mut(&mut self.top_left) += amount,
+            Dir::W => *T::v2_x_mut(&mut self.bottom_right) -= amount,
             _ => panic!("Shrink direction must be cardinal"),
         }
     }
