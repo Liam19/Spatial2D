@@ -280,3 +280,31 @@ impl Orientation {
         }
     }
 }
+
+/// Calculates the nearest 8-way direction from `from` to `to`.
+#[inline]
+pub fn direction_to(from: UVec2, to: UVec2) -> Dir {
+    debug_assert!(from != to, "from and to must not be equal");
+
+    let dx = to.x as i32 - from.x as i32;
+    let dy = to.y as i32 - from.y as i32;
+
+    let adx = dx.abs() as f32;
+    let ady = dy.abs() as f32;
+
+    // tan(22.5°) defines the boundary between axis-aligned and diagonal sectors
+    const TAN_22_5: f32 = 0.41421356;
+
+    let is_horiz = ady < adx * TAN_22_5;
+    let is_vert = adx < ady * TAN_22_5;
+
+    // Determine step vector (-1, 0, or 1) along each axis
+    let step_x = if is_vert { 0 } else { dx.signum() };
+    let step_y = if is_horiz { 0 } else { dy.signum() };
+
+    // Convert 2D step (-1..=1, -1..=1) directly to 0..=8 index into 3x3 grid
+    let idx = ((step_y + 1) * 3 + (step_x + 1)) as usize;
+
+    // Unwrapped from the 3x3 lookup table (0 branching)
+    Dir::FROM_VEC_LUT[idx].expect("from and to must not be equal")
+}
