@@ -85,6 +85,16 @@ impl<T: Clone + Debug> Matrix<T> {
         *self = new;
     }
 
+    #[inline]
+    pub fn set_all(&mut self, value: T)
+    where
+        T: Copy,
+    {
+        for v in self.iter_mut() {
+            *v = value;
+        }
+    }
+
     // #[must_use]
     // #[inline]
     // pub fn stretch_and_fill(&self, spacing: u32, fill_value: T) -> Matrix<T>
