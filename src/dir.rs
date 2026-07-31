@@ -2,6 +2,7 @@ use crate::*;
 
 use Dir::*;
 use core::fmt;
+use std::cmp::Ordering::{Equal, Greater, Less};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
@@ -307,4 +308,33 @@ pub fn direction_to(from: UVec2, to: UVec2) -> Dir {
 
     // Unwrapped from the 3x3 lookup table (0 branching)
     Dir::FROM_VEC_LUT[idx].expect("from and to must not be equal")
+}
+
+/// Calculates the `Dir` between `from` & `to`
+///
+/// Panics if the positions are not aligned along 1 of the 8 `Dir`s
+#[inline]
+pub fn direction_to_aligned(from: UVec2, to: UVec2) -> Dir {
+    debug_assert!(from != to, "from and to must not be equal");
+
+    debug_assert!(
+        {
+            let dx = (to.x as i64 - from.x as i64).abs();
+            let dy = (to.y as i64 - from.y as i64).abs();
+            dx == 0 || dy == 0 || dx == dy
+        },
+        "from/to are not aligned to an 8-way direction"
+    );
+
+    match (to.x.cmp(&from.x), to.y.cmp(&from.y)) {
+        (Equal, Greater) => Dir::S,
+        (Greater, Greater) => Dir::SE,
+        (Greater, Equal) => Dir::E,
+        (Greater, Less) => Dir::NE,
+        (Equal, Less) => Dir::N,
+        (Less, Less) => Dir::NW,
+        (Less, Equal) => Dir::W,
+        (Less, Greater) => Dir::SW,
+        (Equal, Equal) => panic!("from and to must not be equal"),
+    }
 }
