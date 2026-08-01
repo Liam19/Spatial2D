@@ -246,7 +246,15 @@ impl fmt::Display for Orientation {
     }
 }
 
+use Orientation::*;
+
 impl Orientation {
+    pub const ALL: [Self; 4] = [Vertical, Horizontal, DiagNE, DiagNW];
+
+    pub const ALL_CARDINAL: [Self; 2] = [Vertical, Horizontal];
+
+    pub const ALL_DIAG: [Self; 2] = [DiagNE, DiagNW];
+
     #[must_use]
     #[inline]
     pub const fn opposite(self) -> Self {
