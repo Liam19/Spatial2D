@@ -13,7 +13,7 @@ criterion = { version = "0.7.0", features = ["html_reports"] }
 [dependencies]
 rng = { git = "https://github.com/Liam19/Rng.git" }
 
-glam = { version = "0.30.8", optional = true }
+glam = { version = "0.30.8", optional = true, features = ["serde"] }
 bevy = { version = "0.18.1", default-features = false, optional = true }
 
 hashbrown = "0.16.0"
